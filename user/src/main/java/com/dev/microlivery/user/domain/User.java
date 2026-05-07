@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
@@ -19,33 +19,36 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.enabled = true;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "The name cannot be null, empty or blank")
     @Column(nullable = false)
     private String name;
 
-    @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Invalid email format")
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "Password cannot be blank")
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
-    private Boolean enabled = true;
+    private boolean enabled = true;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    public void disable() {
+        if (!this.enabled) {
+            throw new IllegalStateException("User already disabled");
+        }
+        this.enabled = false;
     }
 }
